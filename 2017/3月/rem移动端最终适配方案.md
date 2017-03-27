@@ -1,7 +1,7 @@
 # rem 移动端最终适配方案
 
-（此方案解决：依据设计师设计稿px,可直接得出映射的rem值，最终实现对不同大小的手机屏幕还原相同设计稿效果）
-另：对于不同retina屏手机清晰展示的解决方案 不在此考虑
+> 此方案解决：依据设计师设计稿px,可直接得出映射的rem值，最终实现对不同大小的手机屏幕还原相同设计稿效果
+> 另：对于不同retina屏手机清晰展示的解决方案 不在此考虑
 
 举个例子 便于理解
 假设
@@ -11,38 +11,61 @@
 
 ## 利用rem to px适配
 
-1. 设计稿映射的手机像素 pxContainWidth = innerWidth / designWidth * designContainWidth
-                                    = 320 / 640 * 20 = 10(px)
+1. 设计稿映射的手机像素 
 
-2. 由rem转px的规则得 remContainWidth = pxContainWidth / htmlFontsize
-                                   = innerWidth / designWidth * designContainWidth / htmlFontsize
-                                   = innerWidth / designWidth / htmlFontsize * designContainWidth
+```
+pxContainWidth = innerWidth / designWidth * designContainWidth
+              = 320 / 640 * 20 = 10(px)
+```
+
+2. 由rem转px的规则得 
+
+```
+remContainWidth = pxContainWidth / htmlFontsize
+               = innerWidth / designWidth * designContainWidth / htmlFontsize
+               = innerWidth / designWidth / htmlFontsize * designContainWidth
+```
 
 3. 假设 rem2px = 100 即 1 rem = 100px
   这样，当设计稿 designContainWidth = 375px时，通过移动小数点，就可以映射 rem值： 3.75rem
-
+  
+```
 那么 htmlFonsize = innerWidth / designWidth * (designContainWidth / remContainWidth)
                  = innerWidth / designWidth * rem2px
+```
 
 ## 利用rem to 百分比适配（巧妙关联了htmlFontsize）
 
-1. 一般情况，默认根节点fontsize为 defaultHtmlFontsize = 16px
+1. 一般情况，默认根节点fontsize为 
+
+```
+  defaultHtmlFontsize = 16px
   假设 设置根节点fontsize = persentHtmlFonsize 百分比
   其实 htmlFonsize = defaultHtmlFontsize * persentHtmlFonsize
+```
 
 2. 由以上 htmlFonsize = innerWidth / designWidth * rem2px 可得
 
+```
   defaultHtmlFontsize * persentHtmlFonsize = innerWidth / designWidth * rem2px
+```
 
-3. 所以 persentHtmlFonsize（%） = innerWidth / designWidth * rem2px / defaultHtmlFontsize *100%
-                               = innerWidth / designWidth * rem2px / defaultHtmlFontsize * 100%
-                               = innerWidth / designWidth * rem2px / 16 * 100%
+3. 所以 
 
-对于特殊情况 defaultHtmlFontsize != 16 px
-所以需要通过 window.getComputedStyle(d, null).getPropertyValue('width') 计算得出 defaultHtmlFontsize
+```
+persentHtmlFonsize（%） = innerWidth / designWidth * rem2px / defaultHtmlFontsize *100%
+                       = innerWidth / designWidth * rem2px / defaultHtmlFontsize * 100%
+                       = innerWidth / designWidth * rem2px / 16 * 100%
+```
+
+> 对于特殊情况 defaultHtmlFontsize != 16 px
+> 所以需要通过
+```
+window.getComputedStyle(d, null).getPropertyValue('width') 计算得出 defaultHtmlFontsize
+```
 
 ## 最终解决方案
-```
+```js
 function adapt(designWidth, rem2px){
   var d = window.document.createElement('div');
   d.style.width = '1rem';
